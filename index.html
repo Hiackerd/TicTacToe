@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacToe Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-radius: 12px;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e1b4b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent-primary);
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .choice-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 200px;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow);
+        }
+
+        .form-section {
+            display: none;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h2 {
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            flex: 1;
+        }
+
+        .radio-label input[type="radio"] {
+            display: none;
+        }
+
+        .radio-label input[type="radio"]:checked + .custom-radio {
+            background: var(--accent-primary);
+        }
+
+        .custom-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .custom-radio::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .radio-label input[type="radio"]:checked + .custom-radio::after {
+            display: block;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, var(--success), #34d399);
+        }
+
+        .btn-warning {
+            background: linear-gradient(90deg, var(--warning), #fbbf24);
+        }
+
+        .lobby-list {
+            margin-top: 30px;
+        }
+
+        .lobby-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+        }
+
+        .lobby-item:hover {
+            border-left-color: var(--accent-primary);
+        }
+
+        .lobby-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .lobby-name {
+            font-weight: 600;
+        }
+
+        .lobby-status {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-count {
+            padding: 3px 10px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 20px;
+            color: var(--accent-primary);
+        }
+
+        .player-count.full {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .join-form {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .join-form.active {
+            display: block;
+        }
+
+        .join-form .form-group {
+            margin-bottom: 10px;
+        }
+
+        .quick-join-info {
+            font-size: 0.8rem;
+            color: var(--warning);
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-primary);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+            border-left: 4px solid var(--accent-primary);
+            max-width: 400px;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .choice-buttons {
+                flex-direction: column;
+            }
+            
+            .choice-btn {
+                min-width: 100%;
+            }
+            
+            .lobby-item {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .lobby-item > div:last-child {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">⭕❌</div>
+                <h1>TicTacToe Online</h1>
+            </div>
+            <p class="tagline">Spiele mit Freunden oder zufälligen Gegnern!</p>
+        </header>
+
+        <div class="welcome-screen">
+            <h2>Was möchtest du tun?</h2>
+            <div class="choice-buttons">
+                <button class="choice-btn" onclick="showForm('create')">Lobby erstellen</button>
+                <button class="choice-btn" onclick="showForm('join')">Lobby beitreten</button>
+            </div>
+        </div>
+
+        <!-- Lobby erstellen Formular -->
+        <div id="createForm" class="form-section">
+            <button class="back-btn" onclick="showWelcome()">← Zurück</button>
+            <div class="card">
+                <h2>Lobby erstellen</h2>
+                <form action="/create" method="POST" onsubmit="return validateCreateForm()">
+                    <div class="form-group">
+                        <label>Dein Name</label>
+                        <input type="text" name="player_name" required placeholder="Gib deinen Namen ein" id="createPlayerName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Lobby Name</label>
+                        <input type="text" name="lobby_name" required placeholder="Name der Lobby" id="lobbyName">
+                    </div>
+                    
+                    <label>Privatsphäre</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="public" checked>
+                            <span class="custom-radio"></span>
+                            <span>Öffentlich</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="private">
+                            <span class="custom-radio"></span>
+                            <span>Privat</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn">Lobby erstellen</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lobby beitreten Formular -->
+        <div id="joinForm" class="form-section">
+            <button class="back-btn" onclick="showWelcome()">← Zurück</button>
+            
+            <div class="card">
+                <h2>Mit Code beitreten</h2>
+                <form action="/join_by_code" method="POST">
+                    <div class="form-group">
+                        <label>Dein Name</label>
+                        <input type="text" name="player_name" required placeholder="Gib deinen Namen ein">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Privater Code</label>
+                        <input type="text" name="code" required placeholder="ABCDEF" maxlength="6" style="text-transform: uppercase">
+                    </div>
+                    
+                    <button type="submit" class="btn">Beitreten</button>
+                </form>
+            </div>
+
+            <div class="lobby-list">
+                <h2>Öffentliche Lobbys</h2>
+                <div id="lobbyList">
+                    {% if lobbies %}
+                        {% for lobby in lobbies %}
+                        <div class="lobby-item" id="lobby-{{ lobby.id }}" data-lobby-id="{{ lobby.id }}">
+                            <div class="lobby-info">
+                                <div class="lobby-name">{{ lobby.name }}</div>
+                                <div class="lobby-status">
+                                    <span class="player-count {% if lobby.players|length >= 2 %}full{% endif %}">
+                                        {{ lobby.players|length }}/2 Spieler
+                                    </span>
+                                    {% if lobby.type == 'private' %} 🔒 {% endif %}
+                                </div>
+                            </div>
+                            {% if lobby.players|length < 2 %}
+                            <div>
+                                <form action="/join/{{ lobby.id }}" method="POST" class="quick-join-form" id="quick-form-{{ lobby.id }}">
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <input type="text" name="player_name" required 
+                                               placeholder="Dein Name" 
+                                               style="flex: 1; min-width: 120px;"
+                                               autocomplete="off">
+                                        <button type="submit" class="btn btn-success" style="white-space: nowrap;">
+                                            Schnell beitreten
+                                        </button>
+                                    </div>
+                                    <div class="quick-join-info">
+                                        Direkter Beitritt - keine Wartezeit!
+                                    </div>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span style="color: var(--danger); font-weight: 600;">Voll</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                        Keine öffentlichen Lobbys verfügbar
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        function showNotification(message, type = "info") {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification show ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function showWelcome() {
+            document.getElementById('createForm').classList.remove('active');
+            document.getElementById('joinForm').classList.remove('active');
+            document.querySelector('.welcome-screen').style.display = 'flex';
+        }
+
+        function showForm(formType) {
+            document.querySelector('.welcome-screen').style.display = 'none';
+            
+            if (formType === 'create') {
+                document.getElementById('createForm').classList.add('active');
+                document.getElementById('joinForm').classList.remove('active');
+            } else {
+                document.getElementById('joinForm').classList.add('active');
+                document.getElementById('createForm').classList.remove('active');
+            }
+        }
+        
+        function validateCreateForm() {
+            const playerName = document.getElementById('createPlayerName').value.trim();
+            const lobbyName = document.getElementById('lobbyName').value.trim();
+            
+            if (!playerName) {
+                showNotification('Bitte gib einen Namen ein.', 'error');
+                return false;
+            }
+            
+            if (!lobbyName) {
+                showNotification('Bitte gib einen Lobbynamen ein.', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Schnelles Beitritt-Formular Validierung
+        document.querySelectorAll('.quick-join-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const playerNameInput = this.querySelector('input[name="player_name"]');
+                const playerName = playerNameInput.value.trim();
+                
+                if (!playerName) {
+                    e.preventDefault();
+                    showNotification('Bitte gib einen Namen ein.', 'error');
+                    playerNameInput.focus();
+                    return false;
+                }
+                
+                // Optional: Schnelle Prüfung ob Lobby noch frei ist
+                const lobbyId = this.id.replace('quick-form-', '');
+                const lobbyItem = document.getElementById('lobby-' + lobbyId);
+                const playerCountSpan = lobbyItem.querySelector('.player-count');
+                
+                if (playerCountSpan.classList.contains('full')) {
+                    e.preventDefault();
+                    showNotification('Lobby ist bereits voll!', 'error');
+                    return false;
+                }
+                
+                // Button deaktivieren während des Ladens
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Beitritt...';
+                
+                return true;
+            });
+        });
+        
+        // Auto-Refresh der Lobbys alle 3 Sekunden
+        setInterval(() => {
+            if (document.getElementById('joinForm').classList.contains('active')) {
+                fetch(window.location.href)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const newDoc = parser.parseFromString(html, 'text/html');
+                        const newLobbyList = newDoc.getElementById('lobbyList');
+                        
+                        if (newLobbyList) {
+                            document.getElementById('lobbyList').innerHTML = newLobbyList.innerHTML;
+                            
+                            // Event-Listener erneut hinzufügen
+                            document.querySelectorAll('.quick-join-form').forEach(form => {
+                                form.addEventListener('submit', function(e) {
+                                    const playerNameInput = this.querySelector('input[name="player_name"]');
+                                    const playerName = playerNameInput.value.trim();
+                                    
+                                    if (!playerName) {
+                                        e.preventDefault();
+                                        showNotification('Bitte gib einen Namen ein.', 'error');
+                                        playerNameInput.focus();
+                                        return false;
+                                    }
+                                    
+                                    const submitBtn = this.querySelector('button[type="submit"]');
+                                    submitBtn.disabled = true;
+                                    submitBtn.innerHTML = 'Beitritt...';
+                                    
+                                    return true;
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Fehler beim Aktualisieren:', error));
+            }
+        }, 3000);
+        
+        // Spieler-Anzahl in Titel anzeigen
+        const lobbyCount = document.querySelectorAll('.lobby-item').length;
+        if (lobbyCount > 0) {
+            document.title = `TicTacToe Online - ${lobbyCount} Lobbys verfügbar`;
+        }
+    </script>
+</body>
+</html>
